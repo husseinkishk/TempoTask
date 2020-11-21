@@ -49,17 +49,9 @@ enum NewsAPIRouter: URLRequestConvertible {
         
         // HTTP Method
         urlRequest.httpMethod = method.rawValue
-        // Common Headers
-//        urlRequest.setValue(ContentType.json.rawValue, forHTTPHeaderField: HTTPHeaderField.acceptType.rawValue)
-//        urlRequest.setValue(ContentType.json.rawValue, forHTTPHeaderField: HTTPHeaderField.contentType.rawValue)
         guard let parameters = parameters else {
             return urlRequest
         }
-        //        do {
-        //            urlRequest.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: .sortedKeys)
-        //        } catch {
-        //            throw AFError.parameterEncodingFailed(reason: .jsonEncodingFailed(error: error))
-        //        }
         return try encoding.encode(urlRequest, with: parameters)
     }
 

@@ -22,7 +22,11 @@ class NewsModel: Codable {
 }
 
 // MARK: - Article
-class Article: Codable {
+class Article: Codable, Equatable {
+    static func == (lhs: Article, rhs: Article) -> Bool {
+        return lhs.content == rhs.content && lhs.articleDescription == rhs.articleDescription
+    }
+
     let source: Source?
     let author, title, articleDescription: String?
     let url: String?
@@ -30,6 +34,10 @@ class Article: Codable {
     let publishedAt: String?
     let content: String?
     var image: Data?
+
+    var formattedPublishDate: String? {
+        DateHelper.getFormattedDateStr2Str(dateStr: publishedAt)
+    }
 
     enum CodingKeys: String, CodingKey {
         case source, author, title

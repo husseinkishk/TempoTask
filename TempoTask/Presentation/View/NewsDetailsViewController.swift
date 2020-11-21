@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SafariServices
 
 class NewsDetailsViewController: UIViewController {
 
@@ -15,7 +16,8 @@ class NewsDetailsViewController: UIViewController {
     @IBOutlet weak var authorLabel: UILabel!
     @IBOutlet weak var contentLabel: UILabel!
     @IBOutlet weak var dateLabel: UILabel!
-    @IBOutlet weak var sourceButton: UIButton!
+    @IBOutlet weak var sourceLabel: UILabel!
+    @IBOutlet weak var urlView: UIView!
     
     var article: Article?
     
@@ -38,18 +40,20 @@ class NewsDetailsViewController: UIViewController {
         descriptionLabel.text = article.articleDescription
         authorLabel.text = article.author
         contentLabel.text = article.content
-        dateLabel.text = article.publishedAt
-        sourceButton.setTitle(article.source?.name, for: .normal)
-        
+        dateLabel.text = article.formattedPublishDate
+        sourceLabel.text = article.source?.name
     }
-    
+
     @IBAction func closeButtonTapped(_ sender: Any) {
         dismiss(animated: true, completion: nil)
     }
-    @IBAction func openSourceTapped(_ sender: Any) {
-        if let urlStr = article?.source?.name,
-           let url = URL(string: urlStr) {
-            UIApplication.shared.open(url)
+
+    @IBAction func urlViewTapped(_ sender: Any) {
+        if let urlStr = article?.source?.name?.handleHttpUrlValidation(), let url = URL(string: urlStr) {
+            let config = SFSafariViewController.Configuration()
+            config.entersReaderIfAvailable = true
+            let vc = SFSafariViewController(url: url, configuration: config)
+            present(vc, animated: true)
         }
     }
 }

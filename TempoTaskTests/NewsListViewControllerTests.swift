@@ -64,16 +64,14 @@ class NewsListViewControllerTests: XCTestCase {
     }
     
     func test_handleRefresh() {
-        guard let refreshControl = newsListViewController?.refreshControl,
-              let articles = newsListViewController?.presenter.getAllArticles() else {
+        guard let refreshControl = newsListViewController?.refreshControl else {
             XCTFail()
             return
         }
         newsListViewController?.handleRefresh(refreshControl)
-        
+
         XCTAssertTrue((newsListViewController?.searchController.searchBar.text ?? "Not empty").isEmpty)
-        
-        XCTAssertTrue(articles.isEmpty)
+
         XCTAssertEqual(newsListViewController?.presenter.page, 1)
         
     }

@@ -16,6 +16,7 @@ class NewsDetailsViewControllerTests: XCTestCase {
         super.setUp()
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         newsDetailsViewController = storyboard.instantiateViewController(identifier: "NewsDetailsViewController") as? NewsDetailsViewController
+        newsDetailsViewController?.article = fetchArticleFromStubs()
         newsDetailsViewController?.loadViewIfNeeded()
     }
 
@@ -24,4 +25,39 @@ class NewsDetailsViewControllerTests: XCTestCase {
         super.tearDown()
     }
 
+    func testLoadData() {
+        XCTAssertEqual(newsDetailsViewController?.titleLabel.text,
+                       newsDetailsViewController?.article?.title)
+
+        XCTAssertEqual(newsDetailsViewController?.descriptionLabel.text,
+                       newsDetailsViewController?.article?.articleDescription)
+
+        XCTAssertEqual(newsDetailsViewController?.authorLabel.text,
+                       newsDetailsViewController?.article?.author)
+
+        XCTAssertEqual(newsDetailsViewController?.contentLabel.text,
+                       newsDetailsViewController?.article?.content)
+
+        XCTAssertEqual(newsDetailsViewController?.dateLabel.text,
+                       newsDetailsViewController?.article?.formattedPublishDate)
+
+        XCTAssertEqual(newsDetailsViewController?.sourceLabel.text,
+                       newsDetailsViewController?.article?.source?.name)
+    }
+    
+    func fetchArticleFromStubs() -> Article? {
+        if let newsStubPath = Bundle.main.url(forResource: "news_stub_for_testing", withExtension: "json") {
+            do {
+                let data = try Data(contentsOf: newsStubPath, options: .mappedIfSafe)
+                let decoder = JSONDecoder()
+                let newsModel = try decoder.decode(NewsModel.self, from: data)
+                
+                let article = newsModel.articles.first
+                return article
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+        return nil
+    }
 }

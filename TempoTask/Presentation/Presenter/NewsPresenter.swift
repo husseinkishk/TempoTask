@@ -11,12 +11,13 @@ protocol NewsView: NSObjectProtocol {
     func startLoading()
     func finishLoading()
     func reloadTableView()
+    func showNoResultsLabel()
 }
 
 class NewsPresenter {
     private let newsAPIClient: NewsAPIClient
     weak var newsView: NewsView?
-    private var newsList: NewsModel?
+    var newsList: NewsModel?
     var page = 1
     private var shouldPaginate = false
     private var query = ""
@@ -37,14 +38,15 @@ class NewsPresenter {
         newsList?.articles.removeAll()
         page = 1
     }
-    
-    func getAllArticles() -> [Article] {
-        if let articles = self.newsList?.articles, articles.count > 0 {
-            return articles
-        }
-        return []
+        
+    func getArticle(row: Int) -> Article? {
+        newsList?.articles[row]
     }
 
+
+    func getArticlesCount() -> Int {
+        newsList?.articles.count ?? 0
+    }
     
     func getNewsList(page: Int, searchKeyword: String, shouldPaginate: Bool = false) {
         if !shouldPaginate {
@@ -56,13 +58,16 @@ class NewsPresenter {
             self.newsView?.finishLoading()
             switch result {
             case .success(let news):
-                if shouldPaginate {
-                    self.newsList?.articles.append(contentsOf: news.articles)
+                if news.articles.isEmpty {
+                    self.newsView?.showNoResultsLabel()
                 } else {
-                    self.newsList = news
+                    if shouldPaginate {
+                        self.newsList?.articles.append(contentsOf: news.articles)
+                    } else {
+                        self.newsList = news
+                    }
+                    self.newsView?.reloadTableView()
                 }
-                self.newsView?.reloadTableView()
-
             case .failure(let error):
                 debugPrint(error.localizedDescription)
             }
@@ -70,11 +75,9 @@ class NewsPresenter {
     }
     
     func paginationHit() {
-        guard
-            let articlesCount = newsList?.articles.count,
+        guard let articlesCount = newsList?.articles.count,
               let total = newsList?.totalResults,
-              articlesCount < total
-        else {
+              articlesCount < total else {
             return
         }
         page += 1

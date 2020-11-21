@@ -52,7 +52,7 @@ class NewsListViewController: UIViewController {
     /// Function to setup presenter
     private func presenterSetup() {
         presenter.attachView(view: self)
-        presenter.getNewsList(page: 1, searchKeyword: "apple")
+        presenter.getNewsList(page: 1, searchKeyword: "a")
     }
 
     /// Function to setup navigation title
@@ -101,11 +101,16 @@ class NewsListViewController: UIViewController {
         presenter.resetData()
         searchController.searchBar.text = ""
         tableView.reloadData()
-        presenter.getNewsList(page: 1, searchKeyword: "apple")
+        presenter.getNewsList(page: 1, searchKeyword: "a")
         refreshControl.endRefreshing()
     }
 }
 extension NewsListViewController: NewsView {
+    func showNoResultsLabel() {
+        noResultLabel.isHidden = false
+        tableView.isHidden = true
+    }
+    
     func startLoading() {
         isLoading = true
         ProgressHUD.show()
@@ -120,6 +125,8 @@ extension NewsListViewController: NewsView {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.prefetchDataSource = self
+        noResultLabel.isHidden = true
+        tableView.isHidden = false
         tableView.reloadData()
     }
 }
